@@ -10,18 +10,9 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     [SerializeField] private CharacterController _charController;
-    [SerializeField] private ControleManager _controller;    
-    
-    [Separator("Basic Movement")]
-    [SerializeField] private float _movementspeed = 5f;
-    [SerializeField] private float gravityMultiplier = 3.0f;
-    [SerializeField] private float _jumpHeight = 15f;
-    [SerializeField] private float smoothTime = 0.05f;
-    
-    [Separator("Dash Movement")] 
-    [SerializeField] private float _dashDuration = 0.2f;
-    [SerializeField] private float _dashCoolDown = 3f;
-    [SerializeField] private float _dashStrength = 3f;
+    [SerializeField] private ControleManager _controller;
+
+    [SerializeField] private MovementSettings _moveSettings;
     
     private Vector3 _input;
     private Vector3 _direction;
@@ -69,16 +60,16 @@ public class Movement : MonoBehaviour
         
         // find where the player wants to move to;
         var targetAngle = Mathf.Atan2(_direction.x, _direction.z) * Mathf.Rad2Deg;
-        var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _currentVelocity, smoothTime);
+        var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _currentVelocity, _moveSettings.TurnTime);
         transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
     }
     
     private void ApplyMovement()
     {
         if(_isDashing)
-            _charController.Move(_direction * (_movementspeed * _dashStrength * Time.deltaTime));
+            _charController.Move(_direction * (_moveSettings.MovementSpeed * _moveSettings.DashStrength * Time.deltaTime));
         else
-            _charController.Move(_direction * (_movementspeed  * Time.deltaTime));
+            _charController.Move(_direction * (_moveSettings.MovementSpeed  * Time.deltaTime));
     }
     
     private void ApplyGravity()
@@ -89,7 +80,7 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            _velocity += _gravity * gravityMultiplier * Time.deltaTime;
+            _velocity += _gravity * _moveSettings.GravityMultiplier * Time.deltaTime;
         }
         
         _direction.y = _velocity;
@@ -106,10 +97,10 @@ public class Movement : MonoBehaviour
     IEnumerator StopDash()
     {
         _isDashing = true;
-        yield return new WaitForSeconds(_dashDuration);
+        yield return new WaitForSeconds(_moveSettings.DashDuration);
         _isDashing = false;
 
-        yield return new WaitForSeconds(_dashCoolDown - _dashDuration);
+        yield return new WaitForSeconds(_moveSettings.DashCoolDown - _moveSettings.DashDuration);
         _dashRoutine = null;
     }
 
@@ -117,7 +108,7 @@ public class Movement : MonoBehaviour
     {
         if (!IsGrounded()) return;
 
-        _velocity += _jumpHeight;
+        _velocity += _moveSettings.JumpHeight;
     }
     
     private bool IsGrounded() => _charController.isGrounded;
