@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: cdf9a384168ab5745a4b74f381dc2ec4
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Arsenal
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 93ff55c52fbde3643bb71605c82febef, type: 3}
+  - {fileID: 12800000, guid: 5c23156bc11ea3c4da5be16974ee51bd, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
