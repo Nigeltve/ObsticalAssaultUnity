@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using MyBox;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +19,29 @@ namespace _mine.Scripts.UI
         [SerializeField] private UnityEvent _onSuccess;
         [SerializeField] private UnityEvent _onError;
 
+        public void OnEnable()
+        {
+            ClearPage();
+        }
+
+        public void OnDisable()
+        {
+            ClearPage();
+        }
+        
+        private void ClearPage()
+        {
+            _emailInputField.text = "";
+            _passwordInputField.text = "";
+            _errorText.text = "";
+        }
+
         public void LoginUser()
         {
             string email = _emailInputField.text;
             string password = _passwordInputField.text;
-            
-            LootLockerManager.Instance.LoginUser(email, password,
+
+            PlayfabManager.Instance.LoginUser(email, password,
                 () =>
                 {
                     //successful
@@ -34,8 +52,6 @@ namespace _mine.Scripts.UI
                     _errorText.text = errorMessage;
                     _onError.Invoke();
                 });
-            
-            
         }
     }
 }

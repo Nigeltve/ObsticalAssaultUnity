@@ -3,17 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
-using LootLocker.Requests;
+using PlayFab.ClientModels;
 using MyBox;
+using PlayFab;
 using Unity.VisualScripting;
 
-public class LootLockerManager : MyBox.Singleton<LootLockerManager> {
+public class PlayfabManager : MyBox.Singleton<PlayfabManager> {
     private void Awake()
     {
         InitializeSingleton(false);
     }
     
-    public void RegisterUser(string email, string password, string retype, Action onSuccess, Action<string> onError)
+    public void RegisterUser(string email, string password, string username, string retype, Action onSuccess, Action<string> onError)
     {
         if (!CheckEmail(email))
         {
@@ -50,18 +51,35 @@ public class LootLockerManager : MyBox.Singleton<LootLockerManager> {
             onError("Password did not contain a special character");
             return;
         }
-        
-        LootLockerSDKManager.WhiteLabelSignUp(email, password, (response) =>
-        {
-            if (!response.success)
-            {
-                Debug.Log("error while creating user");
-                onError("There was an error when creating the account");
-                return;
-            }
 
-            onSuccess();
-        });
+        if (username.IsNullOrEmpty())
+        {
+            onError("username empty");
+            return;
+        }
+        
+        if (username.Length <= 4)
+        {
+            onError("username was too short");
+            return;
+        }
+        
+        var request = new RegisterPlayFabUserRequest{
+            Email = email,
+            Password = password,
+            Username = username,
+            RequireBothUsernameAndEmail = true
+        };
+        
+        PlayFabClientAPI.RegisterPlayFabUser(request, 
+            (res) =>
+            {
+                onSuccess();
+            },
+            (error) =>
+            {
+                onError(error.ErrorMessage);
+            });
     }
 
     public void LoginUser(string email, string password, Action onSuccess, Action<string> onError)
@@ -71,32 +89,29 @@ public class LootLockerManager : MyBox.Singleton<LootLockerManager> {
             onError("Email was not ivalid");
             return;
         }
-        
-        LootLockerSDKManager.WhiteLabelLogin(email, password, (response) =>
+
+        var request = new LoginWithEmailAddressRequest()
         {
-            if (!response.success)
-            {
-                onError("Something went wrong");
-                return;
-            }
-
-            onSuccess();
-        });
+            Email = email,
+            Password = password,
+        };
         
-
+        PlayFabClientAPI.LoginWithEmailAddress(request,
+            (res) =>
+            {
+                onSuccess();
+            },
+            (error) =>
+            {
+                onError(error.ErrorMessage);
+            });
+        
+        
     }
     
     public bool CheckEmail(string email)
     {
         if (CheckRegEx( new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"), email))
-            return true;
-        
-        return false;
-    }
-    
-    public bool CheckPassword(string password)
-    {
-        if (CheckRegEx(new Regex(@"^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$"), password))
             return true;
         
         return false;
@@ -141,10 +156,10 @@ public class LootLockerManager : MyBox.Singleton<LootLockerManager> {
 
         return false;
     }
+    
     private bool CheckRegEx(Regex re, string input)
     {
         return re.IsMatch(input);
     }
-    
     
 }

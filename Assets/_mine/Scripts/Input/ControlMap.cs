@@ -55,6 +55,15 @@ namespace PlayerInput
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Tab"",
+                    ""type"": ""Button"",
+                    ""id"": ""51c01903-2114-4ac0-aceb-d1f3a7c63dd2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -167,6 +176,17 @@ namespace PlayerInput
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8ec8e69d-2179-4744-ba38-95f6c170b306"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Tab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -201,6 +221,7 @@ namespace PlayerInput
             m_Default_Movement = m_Default.FindAction("Movement", throwIfNotFound: true);
             m_Default_Dash = m_Default.FindAction("Dash", throwIfNotFound: true);
             m_Default_Jump = m_Default.FindAction("Jump", throwIfNotFound: true);
+            m_Default_Tab = m_Default.FindAction("Tab", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -263,6 +284,7 @@ namespace PlayerInput
         private readonly InputAction m_Default_Movement;
         private readonly InputAction m_Default_Dash;
         private readonly InputAction m_Default_Jump;
+        private readonly InputAction m_Default_Tab;
         public struct DefaultActions
         {
             private @ControlMap m_Wrapper;
@@ -270,6 +292,7 @@ namespace PlayerInput
             public InputAction @Movement => m_Wrapper.m_Default_Movement;
             public InputAction @Dash => m_Wrapper.m_Default_Dash;
             public InputAction @Jump => m_Wrapper.m_Default_Jump;
+            public InputAction @Tab => m_Wrapper.m_Default_Tab;
             public InputActionMap Get() { return m_Wrapper.m_Default; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -288,6 +311,9 @@ namespace PlayerInput
                     @Jump.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnJump;
                     @Jump.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnJump;
                     @Jump.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnJump;
+                    @Tab.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnTab;
+                    @Tab.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnTab;
+                    @Tab.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnTab;
                 }
                 m_Wrapper.m_DefaultActionsCallbackInterface = instance;
                 if (instance != null)
@@ -301,6 +327,9 @@ namespace PlayerInput
                     @Jump.started += instance.OnJump;
                     @Jump.performed += instance.OnJump;
                     @Jump.canceled += instance.OnJump;
+                    @Tab.started += instance.OnTab;
+                    @Tab.performed += instance.OnTab;
+                    @Tab.canceled += instance.OnTab;
                 }
             }
         }
@@ -328,6 +357,7 @@ namespace PlayerInput
             void OnMovement(InputAction.CallbackContext context);
             void OnDash(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
+            void OnTab(InputAction.CallbackContext context);
         }
     }
 }
