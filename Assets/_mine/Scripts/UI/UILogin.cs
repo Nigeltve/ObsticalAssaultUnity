@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using MyBox;
-using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
@@ -10,13 +9,16 @@ namespace _mine.Scripts.UI
 {
     public class UILogin : MonoBehaviour
     {
-        [Separator("ui elements")]
+        [Separator("ui elements")] [SerializeField]
+        private GameObject _inner;
         [SerializeField] private TMP_InputField _emailInputField;
         [SerializeField] private TMP_InputField _passwordInputField;
+        [SerializeField] private Toggle _rememberToggle;
         [SerializeField] private TMP_Text _errorText;
     
         [Separator("Events")]
-        [SerializeField] private UnityEvent _onSuccess;
+        [SerializeField] private UnityEvent _onSuccessWithName;
+        [SerializeField] private UnityEvent _onSuccessWithoutName;
         [SerializeField] private UnityEvent _onError;
 
         public void OnEnable()
@@ -27,6 +29,18 @@ namespace _mine.Scripts.UI
         public void OnDisable()
         {
             ClearPage();
+        }
+
+        public void OpenLoginPage()
+        {
+            ClearPage();
+            _inner.SetActive(true);
+        }
+
+        public void CloseLoginPage()
+        {
+            ClearPage();
+            _inner.SetActive(false);
         }
         
         private void ClearPage()
@@ -40,12 +54,21 @@ namespace _mine.Scripts.UI
         {
             string email = _emailInputField.text;
             string password = _passwordInputField.text;
+            bool remember = _rememberToggle.isOn;
 
-            PlayfabManager.Instance.LoginUser(email, password,
-                () =>
+            LockerManager.Instance.LoginUser(email, password, remember,
+                (hasName) =>
                 {
                     //successful
-                    _onSuccess.Invoke();
+                    if(hasName)
+                        _onSuccessWithName.Invoke();
+                    else
+                        _onSuccessWithoutName.Invoke();
+
+                    if (!remember)
+                    {
+                        LockerManager.Instance.ClearWhiteLabelPlayerPrefs();
+                    }
                 },
                 (errorMessage) =>
                 {
