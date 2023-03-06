@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LootLocker.Requests;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using MyBox;
 using TMPro;
 
@@ -10,7 +11,6 @@ public class UIPlay : MonoBehaviour
 {
     [Separator("UI Elements")]
     [SerializeField] private GameObject _inner;
-
     [SerializeField] private TMP_Text _errorText;
     
     [Separator("Events")]
@@ -19,9 +19,11 @@ public class UIPlay : MonoBehaviour
     
     public void PlayGame()
     {
-        LockerManager.Instance.GetItem();
+        Loader.Load(Loader.Scenes.Level3);
     }
 
+    
+    
     public void Logout()
     {
         LockerManager.Instance.LogoutUser(() =>

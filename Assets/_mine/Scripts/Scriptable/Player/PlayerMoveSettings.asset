@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MovementSpeed: 5
   TurnTime: 0.05
-  JumpHeight: 3
+  JumpHeight: 4
   GravityMultiplier: 1
   DashDuration: 0.2
-  DashCoolDown: 3
-  DashStrength: 3
+  DashCoolDown: 0.5
+  DashStrength: 4
