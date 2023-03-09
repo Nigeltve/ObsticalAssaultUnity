@@ -81,16 +81,22 @@ public class LockerManager : Singleton<LockerManager> {
                 onError(GetErrorMessage(response.Error));
                 return;
             }
+
             
-            LootLockerSDKManager.GetPlayerName((res) =>
+            
+            PlayerPrefs.SetString("PlayerID", response.SessionResponse.public_uid);
+            
+
+            LootLockerSDKManager.GetPlayerName((resName) =>
             {
-                if (!res.success)
+                if (!resName.success)
                 {
-                    onError(GetErrorMessage(res.Error));
+                    onError(GetErrorMessage(resName.Error));
                     return;
                 }
-                
-                onSuccess(!res.name.IsNullOrEmpty());
+                if(!resName.name.IsNullOrEmpty())
+                    PlayerPrefs.SetString("PlayerName", resName.name);
+                onSuccess(!resName.name.IsNullOrEmpty());
             });
         });
     }
@@ -132,6 +138,16 @@ public class LockerManager : Singleton<LockerManager> {
             PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
         }
 
+        if (PlayerPrefs.HasKey("PlayerID"))
+        {
+            PlayerPrefs.DeleteKey("PlayerID");
+        }
+
+        if (PlayerPrefs.HasKey("PlayerName"))
+        {
+            PlayerPrefs.DeleteKey("PlayerName");
+        }
+
         if (PlayerPrefs.HasKey("LootLockerWhiteLabelSessionEmail"))
         {
             PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
@@ -164,7 +180,8 @@ public class LockerManager : Singleton<LockerManager> {
                 {
                     onError(GetErrorMessage(nameResponse.Error));
                 }
-                        
+                
+                PlayerPrefs.SetString("PlayerName", nameResponse.name);
                 onSuccess();
             });
     }
@@ -292,6 +309,33 @@ public class LockerManager : Singleton<LockerManager> {
                 
             }
         }
+    }
+
+    public enum LeadBoardIds
+    {
+        LevelOne = 12226,
+        LevelTwo = 12227,
+        LevelThree = 12264,
+        LevelFour = 12265,
+        LevelFive = 12266,
+    }
+    
+    public void AddtoLeaderboard(LeadBoardIds leaderboardID, int score, Action onSuccess, Action<string> onError)
+    {
+        
+        Debug.Log($"leaderboard -> {(int)leaderboardID}");
+        
+        LootLockerSDKManager.SubmitScore(PlayerPrefs.GetString("PlayerName"), score, ((int)leaderboardID).ToString(),
+            (response) =>
+            {
+                if (!response.success)
+                {
+                    onError(response.text);
+                    return;
+                }
+
+                onSuccess();
+            });
     }
 }
 

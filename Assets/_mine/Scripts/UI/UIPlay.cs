@@ -19,9 +19,8 @@ public class UIPlay : MonoBehaviour
     
     public void PlayGame()
     {
-        Loader.Load(Loader.Scenes.Level3);
+        Loader.Load(Loader.Scenes.Level_1);
     }
-
     
     
     public void Logout()
