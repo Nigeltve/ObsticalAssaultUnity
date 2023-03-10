@@ -8,10 +8,27 @@ using LootLocker.Requests;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 
-public class LockerManager : Singleton<LockerManager> {
+public class LockerManager : Singleton<LockerManager>
+{
+    public TextAsset JsonFile;
     private void Awake()
     {
         InitializeSingleton(false);
+       
+    }
+
+
+    private void Start()
+    {
+        if(LootLockerSDKManager.CheckInitialized())
+            InitSDK();
+    }
+
+
+    public void InitSDK()
+    {
+        LootLockerApiKey key = JsonConvert.DeserializeObject<LootLockerApiKey>(JsonFile.text);
+        LootLockerSDKManager.Init(apiKey: key.apiKey, gameVersion: key.gameVersion, domainKey:key.domainKey);
     }
 
     public void RegisterUser(string email, string password, string retype, Action onSuccess, 
@@ -107,7 +124,16 @@ public class LockerManager : Singleton<LockerManager> {
         {
             if (valid)
             {
-                onSuccess();
+                LootLockerSDKManager.StartWhiteLabelSession((res) =>
+                {
+                    if (!res.success)
+                    {
+                        onError();
+                        return;
+                    }
+                    
+                    onSuccess();
+                });
             }
             else
             {
